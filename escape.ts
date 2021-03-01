@@ -115,11 +115,11 @@ export function markEscapers<A>(stmts : Array<Stmt<A>>) : Array<boolean> {
       case "assign": checkEscape(s.value); return;
       case "field-assign": checkEscapeV(s.value); return;
       case "return": checkEscapeV(s.value); return;
-      case "ifjmp":
+      case "expr": checkEscape(s.expr); return;
+      case "ifjmp": checkEscape(s.cond); return;
       case "jmp":
       case "label":
       case "pass":
-      case "expr":
         return;
     }
   });
