@@ -15,10 +15,11 @@ type Val =
   | { tag: "prim"}
   | { tag: "anyval" }
 
+  // Since we will use Set to represent abstract values stored in a variable, we
+  // need === to work, so cache memloc abstract values for identity.
 const mems : Array<Val> = [];
 function MEM(n : number) : Val {
-  if(mems[n]) { return mems[n]; }
-  mems[n] = { tag: "memloc", line: n };
+  if(!(mems[n])) { mems[n] = { tag: "memloc", line: n }; }
   return mems[n];
 }
 const PRIM : Val = {tag: "prim"};
@@ -34,8 +35,8 @@ function union<E>(s1 : Set<E>, s2 : Set<E>) : number {
 }
 
 // Calculate a mapping from assigned names to sets of locations of construct
-// expressions they may hold
-function calculateEnvironment<A>(stmts : Array<Stmt<A>>) : AbstractEnv {
+// expressions they may hold. This may be useful in other analyses as well.
+export function calculateEnvironment<A>(stmts : Array<Stmt<A>>) : AbstractEnv {
   const env : AbstractEnv = new Map();
   var sawChangeThisRound = false;
   function update(varname : string, toAdd : Set<Val>) {
@@ -97,9 +98,13 @@ function calculateEnvironment<A>(stmts : Array<Stmt<A>>) : AbstractEnv {
 
 // Goal: mark each line containing a construct expression as escaping or not,
 // which would tell us we can perform an optimization on it
-function markEscapers<A>(stmts : Array<Stmt<A>>) : Array<boolean> {
+// We could try to add to the annotations on expressions, though this would make
+// the implementation significantly longer
+export function markEscapers<A>(stmts : Array<Stmt<A>>) : Array<boolean> {
 
-  // Our final goal is to fill in this array
+  // Our final goal is to fill in this array, where each index corresponds to a
+  // line in stmts, and gets true at each index where a construct expression is
+  // present that eventually escapes somewhere
   const allocAtLineEscapes = new Array(stmts.length);
 
   // First, we calculate an environment
