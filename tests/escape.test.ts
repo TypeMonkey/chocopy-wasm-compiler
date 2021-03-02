@@ -1,7 +1,7 @@
 import { parse } from '../parser';
 import { tc, defaultTypeEnv } from '../type-check';
 import { flattenStmts } from '../lower';
-import { markEscapers } from '../escape';
+import { markEscapers } from '../flow-escape';
 import { Stmt } from '../ir';
 import { Type } from '../ast';
 

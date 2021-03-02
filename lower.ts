@@ -151,12 +151,17 @@ function flattenExprToExpr<A>(e : A.Expr<A>) : [Array<I.Stmt<A>>, I.Expr<A>] {
 
 function flattenExprToVal<A>(e : A.Expr<A>) : [Array<I.Stmt<A>>, I.Value<A>] {
   var [bstmts, bexpr] = flattenExprToExpr(e);
-  var newName = generateName("binop");
-  var setNewName : I.Stmt<A> = {
-    tag: "assign",
-    a: e.a,
-    name: newName,
-    value: bexpr 
-  };
-  return [[...bstmts, setNewName], {tag: "id", name: newName}];
+  if(bexpr.tag === "value") {
+    return [bstmts, bexpr.value];
+  }
+  else {
+    var newName = generateName("valname");
+    var setNewName : I.Stmt<A> = {
+      tag: "assign",
+      a: e.a,
+      name: newName,
+      value: bexpr 
+    };
+    return [[...bstmts, setNewName], {tag: "id", name: newName}];
+  }
 }
