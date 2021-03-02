@@ -36,7 +36,7 @@ export type Expr<A> =
   | {  a?: A, tag: "construct", name: string }
 
 export type Literal = 
-    { tag: "num", value: BigInt }
+    { tag: "num", value: bigint }
   | { tag: "bool", value: boolean }
   | { tag: "none" }
 
