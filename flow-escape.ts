@@ -48,29 +48,12 @@ export function calculateEnvironment<A>(stmts : Array<Stmt<A>>) : Array<Abstract
       return s.tag === "label" && s.name === lbl;
     });
   }
-  function replace(i : number, varname : string, toReplace : Set<Val>) {
-    if(!envs[i].has(varname)) {
-      envs[i].set(varname, new Set());
-    }
-    let replaced = false;
-    toReplace.forEach(v => {
-      if(!(envs[i].get(varname).has(v))) {
-        replaced = true;
-      }
-    });
-    if(replaced) {
-      console.log("replacing", i, varname, toReplace, envs[i].get(varname));
-      sawChangeThisRound = true;
-    }
-    envs[i].set(varname, new Set(toReplace));
-  }
   function update(i : number, varname : string, toAdd : Set<Val>) {
     if(!envs[i].has(varname)) {
       envs[i].set(varname, new Set());
     }
     const added = union(envs[i].get(varname), toAdd);
     if(added > 0) {
-      console.log("adding", i, added, toAdd, varname, envs[i].get(varname));
       sawChangeThisRound = true;
     }
   }
@@ -94,7 +77,7 @@ export function calculateEnvironment<A>(stmts : Array<Stmt<A>>) : Array<Abstract
           return;
         case "assign":
           merge(i + 1, i, s.name);
-          replace(i + 1, s.name, vale(envs[i], s.value, i));
+          update(i + 1, s.name, vale(envs[i], s.value, i));
           return;
         case "field-assign":
         case "label":
@@ -105,9 +88,6 @@ export function calculateEnvironment<A>(stmts : Array<Stmt<A>>) : Array<Abstract
         case "return":
           return;
       }
-    });
-    envs.forEach(e => {
-      console.log(e);
     });
     if(sawChangeThisRound) {
       sawChangeThisRound = false;
