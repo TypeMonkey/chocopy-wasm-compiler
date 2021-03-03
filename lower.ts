@@ -139,7 +139,7 @@ function flattenExprToExpr<A>(e : A.Expr<A>) : [Array<I.Stmt<A>>, I.Expr<A>] {
       return [[...objstmts, ...methstmts], { ...e, obj: objval, arguments: methvals } ];
     case "lookup":
       const [ostmts, oval] = flattenExprToVal(e.obj);
-      return [[...ostmts, ...methstmts], { ...e, obj: oval, } ];
+      return [[...ostmts], { ...e, obj: oval, } ];
     case "construct":
       return [[], { ...e } ];
     case "id":
